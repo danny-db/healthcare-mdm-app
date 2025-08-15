@@ -2,6 +2,8 @@
 
 A  Streamlit application for  healthcare Master Data Management operations, powered by Databricks App and ai_query().
 
+Demo walkthrough: https://www.youtube.com/watch?v=g8qPscGfLR4
+
 ## 🏥 Overview
 
 This application provides a complete demonstration for managing patient identity resolution and data quality in  healthcare systems. It leverages Databricks SQL Warehouse and Gen AI models to deliver:
