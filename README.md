@@ -1,4 +1,4 @@
-# Healthcare Master Data Management (MDM) App
+# Healthcare Master Data Management (MDM) Demo App
 
 A  Streamlit application for  healthcare Master Data Management operations, powered by Databricks App and ai_query().
 
