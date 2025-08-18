@@ -206,6 +206,21 @@ def generate_demo_quality_data():
                   ['None'], ['Missing emergency contact'], ['None'], ['Missing blood type'], ['None']]
     })
 
+def generate_demo_duplicate_data():
+    """Generate demo duplicate detection data"""
+    return pd.DataFrame({
+        'id1': [1, 1, 3, 4, 5],
+        'id2': [2, 4, 5, 6, 8],
+        'name1': ['John Smith', 'John Smith', 'Jane Doe', 'Jon Smythe', 'Janet Doe'],
+        'name2': ['J. Smith', 'Jon Smythe', 'Janet Doe', 'John Smith', 'Janie Doe'],
+        'system1': ['EMR_System_A', 'EMR_System_A', 'EMR_System_A', 'Lab_System', 'Billing_System'],
+        'system2': ['EMR_System_B', 'Lab_System', 'Billing_System', 'Registration_System', 'Pharmacy_System'],
+        'similarity_score': [0.95, 0.88, 0.82, 0.75, 0.91],
+        'is_match': ['true', 'true', 'true', 'false', 'true'],
+        'confidence': ['high', 'high', 'medium', 'medium', 'high'],
+        'match_reason': ['Same person, name variation', 'Same person, different spelling', 'Similar names and demographics', 'Different persons', 'Same person, name variation']
+    })
+
 def is_cache_valid(cache_key):
     """Check if cached data is still valid"""
     if cache_key not in st.session_state.cache_timestamps:
@@ -255,6 +270,8 @@ def async_query_wrapper(func):
                 return generate_demo_data()
             elif 'quality' in func.__name__:
                 return generate_demo_quality_data()
+            elif 'duplicate' in func.__name__:
+                return generate_demo_duplicate_data()
             else:
                 return pd.DataFrame()
     
@@ -692,7 +709,9 @@ def show_overview_dashboard(patient_data, quality_data, duplicate_data):
         st.metric("Total Patients", total_patients, delta=None)
     
     with col2:
-        potential_duplicates = len(duplicate_data[duplicate_data['is_match'] == 'true']) if len(duplicate_data) > 0 else 0
+        potential_duplicates = 0
+        if len(duplicate_data) > 0 and 'is_match' in duplicate_data.columns:
+            potential_duplicates = len(duplicate_data[duplicate_data['is_match'] == 'true'])
         st.metric("Potential Duplicates", potential_duplicates, delta=None)
     
     with col3:
@@ -1494,7 +1513,7 @@ def main():
                     duplicate_data = fetch_duplicate_data()
                 progress_bar.progress(100)
             else:
-                duplicate_data = pd.DataFrame()
+                duplicate_data = generate_demo_duplicate_data()  # Use demo data for other pages
                 progress_bar.progress(100)
             
             status_text.text("✅ Data loading complete!")
@@ -1510,7 +1529,7 @@ def main():
         st.error(f"Error loading data: {str(e)}")
         patient_data = generate_demo_data()
         quality_data = generate_demo_quality_data()
-        duplicate_data = pd.DataFrame()
+        duplicate_data = generate_demo_duplicate_data()
     
     # Display selected page
     if page == "📊 Overview":
